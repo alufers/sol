@@ -1,5 +1,9 @@
 package me.alufers.sol
 
+import java.util.ArrayList
+
+
+
 class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     var environment = Environment()
 
@@ -143,7 +147,18 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitCallExpr(expr: Expr.Call): Any? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val callee = evaluate(expr.callee)
+        val arguments = expr.arguments.map { evaluate(it)!! }
+        val function = callee as SolCallable
+        if (callee !is SolCallable) {
+            throw RuntimeError("Can only call functions and classes.",expr.paren.location)
+        }
+        if (arguments.size !== function.arity()) {
+            throw RuntimeError( "Expected " +
+                    function.arity() + " arguments but got " +
+                    arguments.size + ".",expr.paren.location)
+        }
+        return function.call(this, arguments)
     }
 
     override fun visitGetExpr(expr: Expr.Get): Any? {

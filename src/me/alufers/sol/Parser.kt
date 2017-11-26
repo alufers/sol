@@ -1,5 +1,7 @@
 package me.alufers.sol
 
+import java.util.ArrayList
+
 
 class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     private var currentToken: Int = 0
@@ -193,7 +195,33 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
             val right = unary()
             return Expr.Unary(operator, right)
         }
-        return primary()
+        return call()
+    }
+
+    fun call(): Expr {
+        var expr = primary()
+        while (true) {
+            if (matchToken(TokenType.LEFT_PAREN)) {
+                expr = finishCall(expr)
+            } else {
+                break
+            }
+        }
+        return expr
+    }
+
+    fun finishCall(callee: Expr): Expr {
+        val arguments = ArrayList<Expr>()
+        if (!checkToken(TokenType.RIGHT_PAREN)) {
+            do {
+                if (arguments.size >= 255) {
+                    throw ParseError("Cannot have more than 8 arguments.", getLocation())
+                }
+                arguments.add(expression())
+            } while (matchToken(TokenType.COMMA))
+        }
+        val paren = consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+        return Expr.Call(callee, paren, arguments)
     }
 
     fun primary(): Expr {
