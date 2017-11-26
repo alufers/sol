@@ -7,6 +7,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     var environment = Environment()
 
     internal class BreakExeption : Throwable("break") // kill me
+    class ReturnExeption(val value: Any?) : Throwable("return")
 
     override fun visitBreakStmt(stmt: Stmt.Break) {
         throw BreakExeption()
@@ -38,6 +39,17 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
         }
     }
 
+    fun visitFunctionBlockStmt(stmt: Stmt.Block, createEnv: (Environment) -> Environment) {
+        try {
+            environment = createEnv(environment) // create a new environment connected to the old one
+            for (innerStmt in stmt.statements) {
+                execute(innerStmt)
+            }
+        } finally {
+            environment = environment.parent ?: throw IllegalStateException("Tried to exit global environment") // move upwards
+        }
+    }
+
     override fun visitClassStmt(stmt: Stmt.Class) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -47,7 +59,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitFunctionStmt(stmt: Stmt.Function) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        environment.define(stmt.name.literalValue as String, SolFunction(stmt))
     }
 
     override fun visitIfStmt(stmt: Stmt.If) {
@@ -64,7 +76,10 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitReturnStmt(stmt: Stmt.Return) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if(stmt.value == null) {
+            throw ReturnExeption(null)
+        }
+        throw ReturnExeption(evaluate(stmt.value))
     }
 
     override fun visitMutDeclarationStmt(stmt: Stmt.MutDeclaration) {

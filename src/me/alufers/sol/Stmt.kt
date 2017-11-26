@@ -43,7 +43,7 @@ abstract class Stmt {
         }
     }
 
-    data class Function(val name: Token, val parameters: List<Token>, val body: List<Stmt>) : Stmt() {
+    data class Function(val name: Token, val parameters: ArrayList<Token>, val body: Stmt) : Stmt() {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitFunctionStmt(this)
@@ -72,14 +72,14 @@ abstract class Stmt {
         }
     }
 
-    data class Return(val keyword: Token, val value: Expr) : Stmt() {
+    data class Return(val keyword: Token, val value: Expr?) : Stmt() {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitReturnStmt(this)
         }
     }
 
-    class Break : Stmt() {
+    class Break(val keyword: Token) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitBreakStmt(this)
         }

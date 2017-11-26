@@ -61,3 +61,15 @@ while(true) {
         break;
     }
 }
+
+fun dupa {
+    print "FUNCTION OK";
+}
+
+dupa();
+
+fun dupaArg arg {
+    print "ARG OK: " + arg;
+}
+
+dupaArg(3);

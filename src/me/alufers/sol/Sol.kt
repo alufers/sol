@@ -9,7 +9,6 @@ fun runCode(source: String, label: String): Boolean {
     val scanner = Scanner(source, reporter)
     val tokens = scanner.scan()
     val start = System.currentTimeMillis()
-    println("INSIDE")
     if (!reporter.hadError) {
         val parser = Parser(ArrayList(tokens), reporter)
         val statements = parser.parse()

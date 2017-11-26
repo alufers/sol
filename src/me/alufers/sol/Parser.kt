@@ -21,6 +21,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun declaration(): Stmt {
         if (matchToken(TokenType.MUT)) return varDeclaration()
+        if (matchToken(TokenType.FUN)) return functionDeclaration()
         return statement()
     }
 
@@ -32,6 +33,32 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         }
         consume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
         return Stmt.MutDeclaration(name, initializer)
+    }
+
+    fun functionDeclaration(): Stmt {
+        val name = consume(TokenType.IDENTIFIER, "Expected function name after 'fun' keyword")
+        val parameters = ArrayList<Token>()
+
+        when {
+            matchToken(TokenType.IDENTIFIER) -> parameters.add(previous())
+            matchToken(TokenType.LEFT_PAREN) -> {
+                paramLoop@
+                while (matchToken(TokenType.IDENTIFIER) && !isAtEnd()) {
+                    parameters.add(previous())
+                    when {
+                        matchToken(TokenType.COMMA) -> {
+                        }
+                        matchToken(TokenType.RIGHT_PAREN) -> break@paramLoop
+                        else -> throw ParseError("Unextected token ${advance()} at function parameters declaration", previous().location)
+                    }
+                }
+            }
+        }
+        var body = controlFlowBody()
+        if (body !is Stmt.Block) {
+            body = Stmt.Block(listOf(body))
+        }
+        return Stmt.Function(name, parameters, body)
 
     }
 
@@ -41,6 +68,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         if (matchToken(TokenType.IF)) return ifStatement()
         if (matchToken(TokenType.WHILE)) return whileStatement()
         if (matchToken(TokenType.BREAK)) return breakStatement()
+        if (matchToken(TokenType.RETURN)) return returnStatement()
         return expressionStatement()
     }
 
@@ -63,14 +91,25 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     fun controlFlowBody(): Stmt {
         return when {
             matchToken(TokenType.LEFT_BRACE) -> block()
-            matchToken(TokenType.RETURN) -> throw ParseError("return not yet implemented", peek().location)
+            matchToken(TokenType.RETURN) -> returnStatement()
             else -> throw ParseError("Expected block or return as control flow body", peek().location)
         }
     }
 
     fun breakStatement(): Stmt {
+        val keyword = previous()
         consume(TokenType.SEMICOLON, "Expected ';' after break statement")
-        return Stmt.Break()
+        return Stmt.Break(keyword)
+    }
+
+    fun returnStatement(): Stmt {
+        val keyword = previous()
+        var value : Expr? = null
+        if (!checkToken(TokenType.SEMICOLON)) {
+            value = expression()
+        }
+        consume(TokenType.SEMICOLON, "Expected ';' after return statement")
+        return Stmt.Return(keyword, value)
     }
 
     fun block(): Stmt {
@@ -226,7 +265,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
                 arguments.add(expression())
             } while (matchToken(TokenType.COMMA))
         }
-        val paren = consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+        val paren = consume(TokenType.RIGHT_PAREN, "Expected ')' after arguments.")
         return Expr.Call(callee, paren, arguments)
     }
 
