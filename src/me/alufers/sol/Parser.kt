@@ -215,7 +215,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         if (!checkToken(TokenType.RIGHT_PAREN)) {
             do {
                 if (arguments.size >= 255) {
-                    throw ParseError("Cannot have more than 8 arguments.", getLocation())
+                    throw ParseError("Cannot have more than 255 arguments.", getLocation())
                 }
                 arguments.add(expression())
             } while (matchToken(TokenType.COMMA))
