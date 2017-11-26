@@ -30,8 +30,8 @@ print "original shadowed = " + shadowed;
 }
 
 // test or
-print "test" or 10;
-print nil or "nope";
+print "TRUTHY + OR OK" or 10;
+print nil or "NIL + OR OK";
 
 print 5 == 5;
 
