@@ -24,7 +24,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun varDeclaration(): Stmt {
         val name = consume(TokenType.IDENTIFIER, "Expected variable name after 'var' keyword.")
-        var initializer: Expr? = null;
+        var initializer: Expr? = null
         if (matchToken(TokenType.EQUAL)) { // initializer present
             initializer = expression()
         }
@@ -75,6 +75,10 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     fun equality(): Expr {
         var expr: Expr = comparsion()
         while (matchToken(TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL)) {
+            when(expr) {
+                is Expr.Variable -> Expr.Assign(expr.name, expression())
+                else -> throw ParseError("Invalid assignment target", getLocation())
+            }
             val right = comparsion()
             val operator = previous()
             expr = Expr.Binary(expr, operator, right)
