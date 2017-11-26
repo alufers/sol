@@ -12,6 +12,7 @@ fun runCode(source: String, label: String) {
     if (!reporter.hadError) {
         val parser = Parser(ArrayList(tokens), reporter)
         val expr = parser.expression()
+        println(expr)
         val interpreter = Interpreter(reporter)
         println(interpreter.interpret(expr))
     }

@@ -6,7 +6,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
         try {
             return stringify(evaluate(expr))
         } catch (e: RuntimeError) {
-            errorReporter.reportError(e.message ?: "Unknown error")
+            errorReporter.reportError(e.message ?: "Unknown error", e.location)
         }
         return "<errored>"
     }
@@ -63,10 +63,10 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
                     TokenType.MINUS -> left - right
                     TokenType.STAR -> left * right
                     TokenType.SLASH -> left / right
-                    else -> throw RuntimeError("Binary operator ${expr.operator.lexeme} for types ${typeName(left)} and ${typeName(right)} is not supported.")
+                    else -> throw RuntimeError("Binary operator ${expr.operator.lexeme} for types ${typeName(left)} and ${typeName(right)} is not supported.", expr.operator.location)
                 }
             } else {
-                throw RuntimeError("Binary operator ${expr.operator.lexeme} for types ${typeName(left)} and ${typeName(right)} is not supported.")
+                throw RuntimeError("Binary operator ${expr.operator.lexeme} for types ${typeName(left)} and ${typeName(right)} is not supported.", expr.operator.location)
             }
 
         }
@@ -108,9 +108,9 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?> {
             TokenType.MINUS -> if (right is Double) {
                 -right
             } else {
-                throw RuntimeError("Can't negate a non-number")
+                throw RuntimeError("Can't negate a non-number", expr.operator.location)
             }
-            else -> throw RuntimeError("Unsupported unary operator ${expr.operator.type.lexeme}.")
+            else -> throw RuntimeError("Unsupported unary operator ${expr.operator.type.lexeme}.", expr.operator.location)
 
         }
     }

@@ -1,5 +1,6 @@
 package me.alufers.sol
 
+import com.sun.org.apache.bcel.internal.classfile.Code
 
 
 class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
@@ -80,7 +81,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
                 return Expr.Grouping(expr)
             }
             else -> {
-                throw ParseError("Primary expression can't be matched")
+                throw ParseError("Primary expression can't be matched", getLocation())
             }
         }
     }
@@ -88,7 +89,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun consume(tt: TokenType, errorMessage: String): Token {
         if (checkToken(tt)) return advance()
-        throw ParseError(errorMessage)
+        throw ParseError(errorMessage, getLocation())
     }
 
     fun matchToken(vararg toMatch: TokenType): Boolean {
@@ -117,6 +118,10 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     private fun peek(): Token {
         return tokens[currentToken]
+    }
+
+    private fun getLocation(): CodeLocation {
+        return tokens[currentToken].location
     }
 
     private fun previous(): Token {
