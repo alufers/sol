@@ -1,5 +1,7 @@
 package me.alufers.sol
 
+import org.omg.SendingContext.RunTime
+
 class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     val globalEnvironment = Environment()
 
@@ -88,7 +90,13 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitAssignExpr(expr: Expr.Assign): Any? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val value = evaluate(expr.value)
+        try {
+            globalEnvironment.set(expr.name.literalValue as String, value)
+        } catch (e: Environment.ValueNotDefinedError) {
+            throw RuntimeError(e.message ?: "ValueNotDefinedError", expr.name.location)
+        }
+        return value
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
@@ -162,6 +170,10 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? {
-        return globalEnvironment.get(expr.name.literalValue as String)
+        try {
+            return globalEnvironment.get(expr.name.literalValue as String)
+        } catch (e: Environment.ValueNotDefinedError) {
+            throw RuntimeError(e.message ?: "ValueNotDefinedError", expr.name.location)
+        }
     }
 }

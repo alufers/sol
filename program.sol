@@ -17,3 +17,7 @@ var y = 6 * 2;
 var z = x * y;
 
 print "z = " + z;
+
+var mutated = 9*3;
+mutated = "str";
+print "mutated = " + mutated;
