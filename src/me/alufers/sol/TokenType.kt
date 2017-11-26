@@ -50,7 +50,7 @@ enum class TokenType(val lexeme: String?, val isKeyword: Boolean = false) {
             return "KEYWORD $lexeme"
         }
         if (lexeme != null) {
-            return "TOKEN '$lexeme'"
+            return "'$lexeme'"
         }
         return name
     }

@@ -10,7 +10,12 @@ fun runCode(source: String, label: String) {
 
     val tokens = scanner.scan()
 
-    println(tokens.joinToString())
+    val parser = Parser(ArrayList(tokens), reporter)
+
+    val expr = parser.expression()
+
+    println(expr)
+
 }
 
 fun repl() {

@@ -28,6 +28,10 @@ abstract class Expr {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitBinaryExpr(this)
         }
+
+        override fun toString(): String {
+            return "Binary L=(${left.toString()}) OP=${operator.toString()} R=(${right.toString()}) "
+        }
     }
 
     data class Call(val callee: Expr, val paren: Token, val arguments: List<Expr>) : Expr() {
@@ -49,13 +53,23 @@ abstract class Expr {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitGroupingExpr(this)
         }
+
+        override fun toString(): String {
+            return "Grouping (${expression.toString()})"
+        }
+
     }
 
-    data class Literal(val value: Object) : Expr() {
+    data class Literal(val value: Any?) : Expr() {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitLiteralExpr(this)
         }
+
+        override fun toString(): String {
+            return "Literal (${value.toString()})"
+        }
+
     }
 
     data class Logical(val left: Expr, val operator: Token, val right: Expr) : Expr() {
@@ -90,6 +104,10 @@ abstract class Expr {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitUnaryExpr(this)
+        }
+
+        override fun toString(): String {
+            return "Unary OP=${operator.toString()} R=(${right.toString()}) "
         }
     }
 
