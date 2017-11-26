@@ -79,9 +79,21 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         return expr
     }
 
+
     fun multiplication(): Expr {
+        var expr: Expr = exponentiation()
+        while (matchToken(TokenType.STAR,TokenType.SLASH, TokenType.PERCENT)) {
+            val operator = previous()
+            val right = exponentiation()
+
+            expr = Expr.Binary(expr, operator, right)
+        }
+        return expr
+    }
+
+    fun exponentiation(): Expr {
         var expr: Expr = unary()
-        while (matchToken(TokenType.STAR, TokenType.STAR_STAR, TokenType.SLASH, TokenType.PERCENT)) {
+        while (matchToken(TokenType.STAR_STAR)) {
             val operator = previous()
             val right = unary()
 
