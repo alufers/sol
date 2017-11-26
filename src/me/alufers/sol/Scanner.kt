@@ -52,7 +52,7 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
                 }
             }
             '*' -> addToken(TokenType.STAR)
-            '%' -> addToken(TokenType.MODULO)
+            '%' -> addToken(TokenType.PERCENT)
             '!' -> addToken(if (match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
             '>' -> addToken(if (match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
             '<' -> addToken(if (match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
