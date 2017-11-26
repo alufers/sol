@@ -67,7 +67,9 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitWhileStmt(stmt: Stmt.While) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        while(isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body)
+        }
     }
 
 
