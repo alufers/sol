@@ -12,20 +12,20 @@ print "Test arithmetic: ";
 print "2+2-4*6/7%2**3 = " + (2+2-4*6/7%2**3);
 
 
-var x = 10;
-var y = 6 * 2;
-var z = x * y;
+mut x = 10;
+mut y = 6 * 2;
+mut z = x * y;
 
 print "z = " + z;
 
-var mutated = 9*3;
+mut mutated = 9*3;
 mutated = "str";
 print "mutated = " + mutated;
 
-var shadowed = 5;
+mut shadowed = 5;
 print "original shadowed = " + shadowed;
 {
-    var shadowed = 10;
+    mut shadowed = 10;
     print "shadowed = " + shadowed;
 }
 
@@ -45,8 +45,8 @@ if(10 < 5) {
     print "ELSE OK";
 }
 
-var i = 0;
-while (i < 10) {
+mut i = 0;
+while (i < 100) {
 
     print "i = " + i;
     i = i + 1;

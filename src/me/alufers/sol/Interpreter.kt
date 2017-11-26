@@ -58,7 +58,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visitVarStmt(stmt: Stmt.Var) {
+    override fun visitMutDeclarationStmt(stmt: Stmt.MutDeclaration) {
         try {
             environment.define(stmt.name.literalValue as String, if (stmt.initializer != null) evaluate(stmt.initializer) else null)
         } catch (e: Environment.ValueAlreadyDefinedError) {

@@ -9,7 +9,7 @@ abstract class Stmt {
         fun visitIfStmt(stmt: If): R
         fun visitPrintStmt(stmt: Print): R
         fun visitReturnStmt(stmt: Return): R
-        fun visitVarStmt(stmt: Var): R
+        fun visitMutDeclarationStmt(stmt: MutDeclaration): R
         fun visitWhileStmt(stmt: While): R
     }
 
@@ -78,10 +78,10 @@ abstract class Stmt {
         }
     }
 
-    data class Var(val name: Token, val initializer: Expr?) : Stmt() {
+    data class MutDeclaration(val name: Token, val initializer: Expr?) : Stmt() {
 
         override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitVarStmt(this)
+            return visitor.visitMutDeclarationStmt(this)
         }
     }
 

@@ -1,8 +1,9 @@
 package me.alufers.sol
 
 
-inline fun measureTiming(name:String, block: () -> Unit)  {
+inline fun <R> measureTiming(name: String, block: () -> R): R {
     val start = System.currentTimeMillis()
-    block()
+    val v = block()
     println("$name:" + (System.currentTimeMillis() - start).toString() + "ms\n")
+    return v
 }

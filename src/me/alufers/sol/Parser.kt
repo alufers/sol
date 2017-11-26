@@ -18,7 +18,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     }
 
     fun declaration(): Stmt {
-        if (matchToken(TokenType.VAR)) return varDeclaration()
+        if (matchToken(TokenType.MUT)) return varDeclaration()
         return statement()
     }
 
@@ -29,7 +29,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
             initializer = expression()
         }
         consume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
-        return Stmt.Var(name, initializer)
+        return Stmt.MutDeclaration(name, initializer)
 
     }
 
@@ -221,7 +221,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
             if (previous().type === TokenType.SEMICOLON) return
 
             when (peek().type) {
-                TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
+                TokenType.CLASS, TokenType.FUN, TokenType.MUT, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
             }
 
             advance()

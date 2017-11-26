@@ -8,11 +8,11 @@ fun runCode(source: String, label: String): Boolean {
     val reporter = ErrorReporter(label)
     val scanner = Scanner(source, reporter)
     val tokens = scanner.scan()
-
+    val start = System.currentTimeMillis()
+    println("INSIDE")
     if (!reporter.hadError) {
         val parser = Parser(ArrayList(tokens), reporter)
         val statements = parser.parse()
-        print(statements?.joinToString())
         if (!reporter.hadError) {
             val interpreter = Interpreter(reporter)
             interpreter.interpret(statements ?: ArrayList())
@@ -25,7 +25,9 @@ fun runCode(source: String, label: String): Boolean {
     } else {
         return false
     }
+    println("finished in " + (System.currentTimeMillis() - start).toString() + "ms")
     return true
+
 }
 
 fun repl() {
