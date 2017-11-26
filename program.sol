@@ -61,6 +61,10 @@ while(true) {
         break;
     }
 }
+for mut i = 0; i < 10; i = i + 1 {
+    print i;
+}
+
 
 fun dupa {
     print "FUNCTION OK";
