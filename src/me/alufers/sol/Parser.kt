@@ -39,6 +39,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         if (matchToken(TokenType.PRINT)) return printStatement()
         if (matchToken(TokenType.LEFT_BRACE)) return block()
         if (matchToken(TokenType.IF)) return ifStatement()
+        if (matchToken(TokenType.WHILE)) return whileStatement()
         return expressionStatement()
     }
 
@@ -50,7 +51,12 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
             elseBody = controlFlowBody()
         }
         return Stmt.If(condition, body, elseBody)
+    }
 
+    fun whileStatement(): Stmt {
+        val condition = expression()
+        val body = controlFlowBody()
+        return Stmt.While(condition, body)
     }
 
     fun controlFlowBody(): Stmt {
