@@ -42,7 +42,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     fun block(): Stmt {
         val innerStatements = ArrayList<Stmt>()
         while(!checkToken(TokenType.RIGHT_BRACE) && !isAtEnd()) {
-                innerStatements.add(declaration())
+            innerStatements.add(declaration())
         }
         consume(TokenType.RIGHT_BRACE, "Expected '}' after block statement")
         return Stmt.Block(innerStatements)
@@ -68,12 +68,32 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     }
 
     fun assignment(): Expr {
-        val expr = equality()
+        val expr = or()
         if (matchToken(TokenType.EQUAL)) {
             return when (expr) {
                 is Expr.Variable -> Expr.Assign(expr.name, expression())
                 else -> throw ParseError("Invalid assignment target", getLocation())
             }
+        }
+        return expr
+    }
+
+    fun or(): Expr {
+        var expr = and()
+        while (matchToken(TokenType.OR)) {
+            val operator = previous()
+            val right = and()
+            expr = Expr.Logical(expr, operator, right)
+        }
+        return expr
+    }
+
+    fun and(): Expr {
+        var expr = equality()
+        while (matchToken(TokenType.AND)) {
+            val operator = previous()
+            val right = equality()
+            expr = Expr.Logical(expr, operator, right)
         }
         return expr
     }

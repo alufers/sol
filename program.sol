@@ -28,3 +28,7 @@ print "original shadowed = " + shadowed;
     var shadowed = 10;
     print "shadowed = " + shadowed;
 }
+
+// test or
+print "test" or 10;
+print nil or "nope";
