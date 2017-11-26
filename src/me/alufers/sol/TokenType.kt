@@ -13,6 +13,7 @@ enum class TokenType(val lexeme: String?, val isKeyword: Boolean = false) {
     SEMICOLON(";"),
     SLASH("/"),
     STAR("*"),
+    MODULO("%"),
 
     // One or two character tokens.
     BANG("!"),

@@ -81,7 +81,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun multiplication(): Expr {
         var expr: Expr = unary()
-        while (matchToken(TokenType.STAR, TokenType.SLASH)) {
+        while (matchToken(TokenType.STAR, TokenType.SLASH, TokenType.MODULO)) {
             val operator = previous()
             val right = unary()
 
@@ -148,8 +148,8 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     }
 
     private fun checkToken(tt: TokenType): Boolean {
-        if (isAtEnd()) return false;
-        return peek().type == tt;
+        if (isAtEnd()) return false
+        return peek().type == tt
     }
 
     private fun advance(): Token {
