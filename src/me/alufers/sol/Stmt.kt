@@ -57,6 +57,7 @@ abstract class Stmt {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitPrintStmt(this)
         }
+
         override fun toString(): String {
             return "Print ($expression)"
         }
@@ -69,7 +70,7 @@ abstract class Stmt {
         }
     }
 
-    data class Var(val name: Token, val initializer: Expr) : Stmt() {
+    data class Var(val name: Token, val initializer: Expr?) : Stmt() {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitVarStmt(this)

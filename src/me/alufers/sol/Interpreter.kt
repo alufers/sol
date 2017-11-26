@@ -1,6 +1,8 @@
 package me.alufers.sol
 
 class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
+    val globalEnvironment = Environment()
+
     fun interpret(statements: ArrayList<Stmt>): String {
         try {
             for (stmt in statements) {
@@ -45,7 +47,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitVarStmt(stmt: Stmt.Var) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        globalEnvironment.define(stmt.name.literalValue as String, if (stmt.initializer != null) evaluate(stmt.initializer) else null)
     }
 
     override fun visitWhileStmt(stmt: Stmt.While) {
@@ -159,6 +161,6 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return globalEnvironment.get(expr.name.literalValue as String)
     }
 }

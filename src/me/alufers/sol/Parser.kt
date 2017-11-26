@@ -8,13 +8,29 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         try {
             val statements = ArrayList<Stmt>()
             while (!isAtEnd()) {
-                statements.add(statement())
+                statements.add(declaration())
             }
             return statements
         } catch (e: ParseError) {
             errorReporter.reportError(e.message ?: "Unknown error", e.location)
             return null
         }
+    }
+
+    fun declaration(): Stmt {
+        if (matchToken(TokenType.VAR)) return varDeclaration()
+        return statement()
+    }
+
+    fun varDeclaration(): Stmt {
+        val name = consume(TokenType.IDENTIFIER, "Expected variable name after 'var' keyword.")
+        var initializer: Expr? = null;
+        if (matchToken(TokenType.EQUAL)) { // initializer present
+            initializer = expression()
+        }
+        consume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
+        return Stmt.Var(name, initializer)
+
     }
 
     fun statement(): Stmt {
@@ -107,6 +123,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
             matchToken(TokenType.FALSE) -> Expr.Literal(false)
             matchToken(TokenType.NIL) -> Expr.Literal(null)
             matchToken(TokenType.NUMBER, TokenType.STRING) -> Expr.Literal(previous().literalValue)
+            matchToken(TokenType.IDENTIFIER) -> Expr.Variable(previous())
             matchToken(TokenType.LEFT_PAREN) -> {
                 val expr = expression()
                 consume(TokenType.RIGHT_PAREN, "Expected ')' after expression")
