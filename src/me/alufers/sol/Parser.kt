@@ -75,10 +75,6 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     fun equality(): Expr {
         var expr: Expr = comparsion()
         while (matchToken(TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL)) {
-            when(expr) {
-                is Expr.Variable -> Expr.Assign(expr.name, expression())
-                else -> throw ParseError("Invalid assignment target", getLocation())
-            }
             val right = comparsion()
             val operator = previous()
             expr = Expr.Binary(expr, operator, right)
