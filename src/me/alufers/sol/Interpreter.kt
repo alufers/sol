@@ -42,7 +42,12 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitIfStmt(stmt: Stmt.If) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val shouldGo = isTruthy(evaluate(stmt.condition))
+        if (shouldGo) {
+            execute(stmt.thenBranch)
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch)
+        }
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print) {

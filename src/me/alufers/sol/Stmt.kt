@@ -18,6 +18,10 @@ abstract class Stmt {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitBlockStmt(this)
         }
+
+        override fun toString(): String {
+            return statements.joinToString()
+        }
     }
 
     data class Class(val name: Token, val superclass: Expr, val methods: List<Function>) : Stmt() {
@@ -45,10 +49,14 @@ abstract class Stmt {
         }
     }
 
-    data class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt) : Stmt() {
+    data class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?) : Stmt() {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitIfStmt(this)
+        }
+
+        override fun toString(): String {
+            return "If C=($condition) T=($thenBranch) E=($elseBranch)"
         }
     }
 

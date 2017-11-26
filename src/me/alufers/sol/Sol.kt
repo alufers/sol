@@ -12,6 +12,7 @@ fun runCode(source: String, label: String): Boolean {
     if (!reporter.hadError) {
         val parser = Parser(ArrayList(tokens), reporter)
         val statements = parser.parse()
+        print(statements?.joinToString())
         if (!reporter.hadError) {
             val interpreter = Interpreter(reporter)
             interpreter.interpret(statements ?: ArrayList())

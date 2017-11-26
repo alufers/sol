@@ -36,13 +36,33 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     fun statement(): Stmt {
         if (matchToken(TokenType.PRINT)) return printStatement()
         if (matchToken(TokenType.LEFT_BRACE)) return block()
+        if (matchToken(TokenType.IF)) return ifStatement()
         return expressionStatement()
+    }
+
+    fun ifStatement(): Stmt {
+        val condition = expression()
+        val body = controlFlowBody()
+        var elseBody: Stmt? = null
+        if (matchToken(TokenType.ELSE)) {
+            elseBody = controlFlowBody()
+        }
+        return Stmt.If(condition, body, elseBody)
+
+    }
+
+    fun controlFlowBody(): Stmt {
+        return when {
+            matchToken(TokenType.LEFT_BRACE) -> block()
+            matchToken(TokenType.RETURN) -> throw ParseError("return not yet implemented", peek().location)
+            else -> throw ParseError("Expected block or return as control flow body", peek().location)
+        }
     }
 
     fun block(): Stmt {
         val innerStatements = ArrayList<Stmt>()
-        while(!checkToken(TokenType.RIGHT_BRACE) && !isAtEnd()) {
-                innerStatements.add(declaration())
+        while (!checkToken(TokenType.RIGHT_BRACE) && !isAtEnd()) {
+            innerStatements.add(declaration())
         }
         consume(TokenType.RIGHT_BRACE, "Expected '}' after block statement")
         return Stmt.Block(innerStatements)
@@ -85,8 +105,8 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     fun equality(): Expr {
         var expr: Expr = comparsion()
         while (matchToken(TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL)) {
-            val right = comparsion()
             val operator = previous()
+            val right = comparsion()
             expr = Expr.Binary(expr, operator, right)
         }
         return expr

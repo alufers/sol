@@ -28,3 +28,15 @@ print "original shadowed = " + shadowed;
     var shadowed = 10;
     print "shadowed = " + shadowed;
 }
+
+print 5 == 5;
+
+if(true) {
+    print "IF OK";
+}
+
+if(10 < 5) {
+
+} else {
+    print "ELSE OK";
+}
