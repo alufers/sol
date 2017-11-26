@@ -23,7 +23,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     }
 
     fun varDeclaration(): Stmt {
-        val name = consume(TokenType.IDENTIFIER, "Expected variable name after 'var' keyword.")
+        val name = consume(TokenType.IDENTIFIER, "Expected variable name after 'var' keyword")
         var initializer: Expr? = null
         if (matchToken(TokenType.EQUAL)) { // initializer present
             initializer = expression()
@@ -35,7 +35,17 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun statement(): Stmt {
         if (matchToken(TokenType.PRINT)) return printStatement()
+        if (matchToken(TokenType.LEFT_BRACE)) return block()
         return expressionStatement()
+    }
+
+    fun block(): Stmt {
+        val innerStatements = ArrayList<Stmt>()
+        while(!checkToken(TokenType.RIGHT_BRACE) && !isAtEnd()) {
+                innerStatements.add(declaration())
+        }
+        consume(TokenType.RIGHT_BRACE, "Expected '}' after block statement")
+        return Stmt.Block(innerStatements)
     }
 
     fun printStatement(): Stmt {
@@ -59,8 +69,8 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun assignment(): Expr {
         val expr = equality()
-        if(matchToken(TokenType.EQUAL)) {
-            return when(expr) {
+        if (matchToken(TokenType.EQUAL)) {
+            return when (expr) {
                 is Expr.Variable -> Expr.Assign(expr.name, expression())
                 else -> throw ParseError("Invalid assignment target", getLocation())
             }
@@ -109,7 +119,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun multiplication(): Expr {
         var expr: Expr = exponentiation()
-        while (matchToken(TokenType.STAR,TokenType.SLASH, TokenType.PERCENT)) {
+        while (matchToken(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT)) {
             val operator = previous()
             val right = exponentiation()
 

@@ -1,9 +1,7 @@
 package me.alufers.sol
 
-import org.omg.SendingContext.RunTime
-
 class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
-    val globalEnvironment = Environment()
+    var environment = Environment()
 
     fun interpret(statements: ArrayList<Stmt>): String {
         try {
@@ -21,7 +19,14 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitBlockStmt(stmt: Stmt.Block) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        try {
+            environment = Environment(environment) // create a new environment connected to the old one
+            for (innerStmt in stmt.statements) {
+                execute(innerStmt)
+            }
+        } finally {
+            environment = environment.parent ?: throw IllegalStateException("Tried to exit global environment") // move upwards
+        }
     }
 
     override fun visitClassStmt(stmt: Stmt.Class) {
@@ -49,7 +54,11 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitVarStmt(stmt: Stmt.Var) {
-        globalEnvironment.define(stmt.name.literalValue as String, if (stmt.initializer != null) evaluate(stmt.initializer) else null)
+        try {
+            environment.define(stmt.name.literalValue as String, if (stmt.initializer != null) evaluate(stmt.initializer) else null)
+        } catch (e: Environment.ValueAlreadyDefinedError) {
+            throw RuntimeError(e.message ?: "ValueAlreadyDefinedError", stmt.name.location)
+        }
     }
 
     override fun visitWhileStmt(stmt: Stmt.While) {
@@ -92,7 +101,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     override fun visitAssignExpr(expr: Expr.Assign): Any? {
         val value = evaluate(expr.value)
         try {
-            globalEnvironment.set(expr.name.literalValue as String, value)
+            environment.set(expr.name.literalValue as String, value)
         } catch (e: Environment.ValueNotDefinedError) {
             throw RuntimeError(e.message ?: "ValueNotDefinedError", expr.name.location)
         }
@@ -171,7 +180,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? {
         try {
-            return globalEnvironment.get(expr.name.literalValue as String)
+            return environment.get(expr.name.literalValue as String)
         } catch (e: Environment.ValueNotDefinedError) {
             throw RuntimeError(e.message ?: "ValueNotDefinedError", expr.name.location)
         }

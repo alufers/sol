@@ -21,3 +21,10 @@ print "z = " + z;
 var mutated = 9*3;
 mutated = "str";
 print "mutated = " + mutated;
+
+var shadowed = 5;
+print "original shadowed = " + shadowed;
+{
+    var shadowed = 10;
+    print "shadowed = " + shadowed;
+}
