@@ -47,8 +47,11 @@ if(10 < 5) {
 
 mut i = 0;
 while (i < 100) {
-
     print "i = " + i;
     i = i + 1;
+}
+
+for mut i = 0; i < 10; i = i + 1 {
+    print i;
 }
 

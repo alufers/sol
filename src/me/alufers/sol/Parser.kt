@@ -1,6 +1,7 @@
 package me.alufers.sol
 
 import java.util.ArrayList
+import java.util.Arrays
 
 
 class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
@@ -40,6 +41,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         if (matchToken(TokenType.LEFT_BRACE)) return block()
         if (matchToken(TokenType.IF)) return ifStatement()
         if (matchToken(TokenType.WHILE)) return whileStatement()
+        if (matchToken(TokenType.FOR)) return forStatement()
         return expressionStatement()
     }
 
@@ -57,6 +59,35 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         val condition = expression()
         val body = controlFlowBody()
         return Stmt.While(condition, body)
+    }
+
+    fun forStatement(): Stmt {
+        val initializer: Stmt? = when {
+            matchToken(TokenType.SEMICOLON) -> null
+            matchToken(TokenType.MUT) -> varDeclaration()
+            else -> expressionStatement()
+        }
+        var condition: Expr? = null
+        if (!checkToken(TokenType.SEMICOLON)) {
+            condition = expression()
+        }
+        consume(TokenType.SEMICOLON, "Expect ';' after loop condition.")
+        var increment: Expr? = null
+        if (!checkToken(TokenType.RIGHT_PAREN)) {
+            increment = expression()
+        }
+        var body = controlFlowBody()
+        if (increment != null) {
+            body = Stmt.Block(statements = arrayListOf(
+                    body,
+                    Stmt.Expression(increment)))
+        }
+        if (condition == null) condition = Expr.Literal(true)
+        body = Stmt.While(condition, body)
+        if (initializer != null) {
+            body = Stmt.Block(Arrays.asList(initializer, body))
+        }
+        return body
     }
 
     fun controlFlowBody(): Stmt {
