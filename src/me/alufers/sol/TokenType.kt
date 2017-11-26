@@ -13,6 +13,7 @@ enum class TokenType(val lexeme: String?, val isKeyword: Boolean = false) {
     SEMICOLON(";"),
     SLASH("/"),
     STAR("*"),
+    STAR_STAR("**"),
     PERCENT("%"),
 
     // One or two character tokens.

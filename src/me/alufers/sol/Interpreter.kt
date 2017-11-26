@@ -106,6 +106,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
                     TokenType.GREATER_EQUAL -> left >= right
                     TokenType.MINUS -> left - right
                     TokenType.STAR -> left * right
+                    TokenType.STAR_STAR -> Math.pow(left, right)
                     TokenType.SLASH -> left / right
                     TokenType.PERCENT -> left % right
                     else -> throw RuntimeError("Binary operator ${expr.operator.lexeme} for types ${typeName(left)} and ${typeName(right)} is not supported.", expr.operator.location)
