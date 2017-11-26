@@ -52,3 +52,12 @@ while (i < 100) {
     i = i + 1;
 }
 
+while(true) {
+    break;
+}
+
+while(true) {
+    if(2 >= -1) {
+        break;
+    }
+}

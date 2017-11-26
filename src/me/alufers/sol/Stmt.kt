@@ -9,6 +9,7 @@ abstract class Stmt {
         fun visitIfStmt(stmt: If): R
         fun visitPrintStmt(stmt: Print): R
         fun visitReturnStmt(stmt: Return): R
+        fun visitBreakStmt(stmt: Break): R
         fun visitMutDeclarationStmt(stmt: MutDeclaration): R
         fun visitWhileStmt(stmt: While): R
     }
@@ -75,6 +76,12 @@ abstract class Stmt {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitReturnStmt(this)
+        }
+    }
+
+    class Break : Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitBreakStmt(this)
         }
     }
 
