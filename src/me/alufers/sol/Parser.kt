@@ -14,7 +14,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
      */
     fun equality(): Expr {
         var expr: Expr = comparsion()
-        while (matchToken(TokenType.EQUAL, TokenType.BANG_EQUAL)) {
+        while (matchToken(TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL)) {
             val right = comparsion()
             val operator = previous()
             expr = Expr.Binary(expr, operator, right)
@@ -80,7 +80,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
                 return Expr.Grouping(expr)
             }
             else -> {
-                throw IllegalStateException("Primary expression can't be matched")
+                throw ParseError("Primary expression can't be matched")
             }
         }
     }
@@ -88,7 +88,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun consume(tt: TokenType, errorMessage: String): Token {
         if (checkToken(tt)) return advance()
-        throw IllegalStateException(errorMessage)
+        throw ParseError(errorMessage)
     }
 
     fun matchToken(vararg toMatch: TokenType): Boolean {
