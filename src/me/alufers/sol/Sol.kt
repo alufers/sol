@@ -7,22 +7,19 @@ import java.nio.charset.Charset
 fun runCode(source: String, label: String) {
     val reporter = ErrorReporter(label)
     val scanner = Scanner(source, reporter)
-
     val tokens = scanner.scan()
 
-    val parser = Parser(ArrayList(tokens), reporter)
-
-    val expr = parser.expression()
-
-    println(expr)
-
+    if (!reporter.hadError) {
+        val parser = Parser(ArrayList(tokens), reporter)
+        val expr = parser.expression()
+        println(expr)
+    }
 }
 
 fun repl() {
     println("Sol REPL v0.1")
     println("")
     while (true) {
-
         val line = readLine()
         print(">")
         if (line == null) {

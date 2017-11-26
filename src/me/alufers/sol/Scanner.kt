@@ -86,7 +86,6 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
     }
 
     fun consumeNumberLiteral() {
-        val sb = StringBuilder()
         while (peek() in '0'..'9' || (peek() == '.' && peekNext() in '0'..'9')) {
             advance()
         }
@@ -164,7 +163,7 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
         return CodeLocation(line, col, currentChar)
     }
 
-    fun isAtEnd(): Boolean {
+    private fun isAtEnd(): Boolean {
         return currentChar >= source.length
     }
 }
