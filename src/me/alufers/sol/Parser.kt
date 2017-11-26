@@ -1,10 +1,42 @@
 package me.alufers.sol
 
-import com.sun.org.apache.bcel.internal.classfile.Code
-
 
 class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     private var currentToken: Int = 0
+
+    fun parse(): ArrayList<Stmt>? {
+        try {
+            val statements = ArrayList<Stmt>()
+            while (!isAtEnd()) {
+                statements.add(statement())
+            }
+            return statements
+        } catch (e: ParseError) {
+            errorReporter.reportError(e.message ?: "Unknown error", e.location)
+            return null
+        }
+    }
+
+    fun statement(): Stmt {
+        if (matchToken(TokenType.PRINT)) return printStatement()
+        return expressionStatement()
+    }
+
+    fun printStatement(): Stmt {
+        val value = expression()
+        consume(TokenType.SEMICOLON, "Expected ';' after print statement")
+        return Stmt.Print(value)
+    }
+
+    fun expressionStatement(): Stmt {
+        val value = expression()
+        consume(TokenType.SEMICOLON, "Expected ';' after expression statement")
+        return Stmt.Expression(value)
+    }
+
+    /**
+     * Parses an expression
+     */
     fun expression(): Expr {
         return equality()
     }
@@ -25,7 +57,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     /**
      * comparison → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
-     * Comparsion expressions consist of one addition followed by zerro or more additions joined by comparsion operators (>, <, >=, <=)
+     * Comparsion expressions consist of one addition followed by zero or more additions joined by comparsion operators (>, <, >=, <=)
      */
     fun comparsion(): Expr {
         var expr: Expr = addition()
@@ -86,6 +118,19 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         }
     }
 
+    private fun synchronize() {
+        advance()
+
+        while (!isAtEnd()) {
+            if (previous().type === TokenType.SEMICOLON) return
+
+            when (peek().type) {
+                TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
+            }
+
+            advance()
+        }
+    }
 
     fun consume(tt: TokenType, errorMessage: String): Token {
         if (checkToken(tt)) return advance()

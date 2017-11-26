@@ -32,6 +32,10 @@ abstract class Stmt {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitExpressionStmt(this)
         }
+
+        override fun toString(): String {
+            return "Expression ($expression)"
+        }
     }
 
     data class Function(val name: Token, val parameters: List<Token>, val body: List<Stmt>) : Stmt() {
@@ -52,6 +56,9 @@ abstract class Stmt {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitPrintStmt(this)
+        }
+        override fun toString(): String {
+            return "Print ($expression)"
         }
     }
 
