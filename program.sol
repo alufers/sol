@@ -6,3 +6,5 @@ print "2 + 2 = " + (2 + 2);
 print "TE" + "ST";
 print "Testuje modulo: ";
 print "20 % 3 = " + (20 % 3);
+print "Testuje pow: ";
+print "2 ** 3 = " + (2 ** 3);

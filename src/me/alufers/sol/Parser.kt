@@ -81,7 +81,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun multiplication(): Expr {
         var expr: Expr = unary()
-        while (matchToken(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT)) {
+        while (matchToken(TokenType.STAR, TokenType.STAR_STAR, TokenType.SLASH, TokenType.PERCENT)) {
             val operator = previous()
             val right = unary()
 

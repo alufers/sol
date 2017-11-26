@@ -51,7 +51,7 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
                     addToken(TokenType.SLASH)
                 }
             }
-            '*' -> addToken(TokenType.STAR)
+            '*' -> addToken(if (match('*')) TokenType.STAR_STAR else TokenType.STAR)
             '%' -> addToken(TokenType.PERCENT)
             '!' -> addToken(if (match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
             '>' -> addToken(if (match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
