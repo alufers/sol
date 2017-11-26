@@ -88,12 +88,32 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     }
 
     fun assignment(): Expr {
-        val expr = equality()
+        val expr = or()
         if (matchToken(TokenType.EQUAL)) {
             return when (expr) {
                 is Expr.Variable -> Expr.Assign(expr.name, expression())
                 else -> throw ParseError("Invalid assignment target", getLocation())
             }
+        }
+        return expr
+    }
+
+    fun or(): Expr {
+        var expr = and()
+        while (matchToken(TokenType.OR)) {
+            val operator = previous()
+            val right = and()
+            expr = Expr.Logical(expr, operator, right)
+        }
+        return expr
+    }
+
+    fun and(): Expr {
+        var expr = equality()
+        while (matchToken(TokenType.AND)) {
+            val operator = previous()
+            val right = equality()
+            expr = Expr.Logical(expr, operator, right)
         }
         return expr
     }

@@ -154,7 +154,12 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
 
 
     override fun visitLogicalExpr(expr: Expr.Logical): Any? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val left = evaluate(expr.left)
+        when {
+            expr.operator.type === TokenType.OR -> if (isTruthy(left)) return left
+            else -> if (!isTruthy(left)) return left
+        }
+        return evaluate(expr.right)
     }
 
     override fun visitSetExpr(expr: Expr.Set): Any? {

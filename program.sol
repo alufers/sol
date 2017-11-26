@@ -29,6 +29,10 @@ print "original shadowed = " + shadowed;
     print "shadowed = " + shadowed;
 }
 
+// test or
+print "test" or 10;
+print nil or "nope";
+
 print 5 == 5;
 
 if(true) {
