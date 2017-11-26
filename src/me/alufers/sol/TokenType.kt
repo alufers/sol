@@ -39,6 +39,7 @@ enum class TokenType(val lexeme: String?, val isKeyword: Boolean = false) {
     OR("or", true),
     PRINT("print", true),
     RETURN("return", true),
+    BREAK("break", true),
     SUPER("super", true),
     THIS("this", true),
     TRUE("true", true),

@@ -51,6 +51,15 @@ while (i < 100) {
     i = i + 1;
 }
 
+while(true) {
+    break;
+}
+
+while(true) {
+    if(2 >= -1) {
+        break;
+    }
+}
 for mut i = 0; i < 10; i = i + 1 {
     print i;
 }

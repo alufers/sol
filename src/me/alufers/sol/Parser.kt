@@ -41,6 +41,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         if (matchToken(TokenType.LEFT_BRACE)) return block()
         if (matchToken(TokenType.IF)) return ifStatement()
         if (matchToken(TokenType.WHILE)) return whileStatement()
+        if (matchToken(TokenType.BREAK)) return breakStatement()
         if (matchToken(TokenType.FOR)) return forStatement()
         return expressionStatement()
     }
@@ -96,6 +97,11 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
             matchToken(TokenType.RETURN) -> throw ParseError("return not yet implemented", peek().location)
             else -> throw ParseError("Expected block or return as control flow body", peek().location)
         }
+    }
+
+    fun breakStatement(): Stmt {
+        consume(TokenType.SEMICOLON, "Expected ';' after break statement")
+        return Stmt.Break()
     }
 
     fun block(): Stmt {
