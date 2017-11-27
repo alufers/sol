@@ -29,24 +29,26 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitBlockStmt(stmt: Stmt.Block) {
+        val previousEnvironment = environment
         try {
             environment = Environment(environment) // create a new environment connected to the old one
             for (innerStmt in stmt.statements) {
                 execute(innerStmt)
             }
         } finally {
-            environment = environment.parent ?: throw IllegalStateException("Tried to exit global environment") // move upwards
+            environment = previousEnvironment ?: throw IllegalStateException("Tried to exit global environment") // move upwards
         }
     }
 
     fun visitFunctionBlockStmt(stmt: Stmt.Block, createEnv: (Environment) -> Environment) {
+        val previousEnvironment = environment
         try {
             environment = createEnv(environment) // create a new environment connected to the old one
             for (innerStmt in stmt.statements) {
                 execute(innerStmt)
             }
         } finally {
-            environment = environment.parent ?: throw IllegalStateException("Tried to exit global environment") // move upwards
+            environment = previousEnvironment ?: throw IllegalStateException("Tried to exit global environment") // move upwards
         }
     }
 
@@ -59,7 +61,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitFunctionStmt(stmt: Stmt.Function) {
-        environment.define(stmt.name.literalValue as String, SolFunction(stmt))
+        environment.define(stmt.name.literalValue as String, SolFunction(stmt, environment))
     }
 
     override fun visitIfStmt(stmt: Stmt.If) {
@@ -76,7 +78,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitReturnStmt(stmt: Stmt.Return) {
-        if(stmt.value == null) {
+        if (stmt.value == null) {
             throw ReturnExeption(null)
         }
         throw ReturnExeption(evaluate(stmt.value))
@@ -172,11 +174,12 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
 
     override fun visitCallExpr(expr: Expr.Call): Any? {
         val callee = evaluate(expr.callee)
-        val arguments = expr.arguments.map { evaluate(it)!! }
-        val function = callee as SolCallable
+        val arguments = expr.arguments.map { evaluate(it) }
         if (callee !is SolCallable) {
             throw RuntimeError("Can only call functions and classes.", expr.paren.location)
         }
+        val function = callee
+
         if (arguments.size !== function.arity()) {
             throw RuntimeError("Expected " +
                     function.arity() + " arguments but got " +
