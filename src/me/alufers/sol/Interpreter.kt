@@ -236,4 +236,12 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
             throw RuntimeError(e.message ?: "ValueNotDefinedError", expr.name.location)
         }
     }
+
+    override fun visitPostfixExpr(expr: Expr.Postfix): Any? {
+        return when (expr.operator.type) {
+            TokenType.PLUS_PLUS ->  return evaluate(expr.left)
+            else -> {
+            }
+        }
+    }
 }

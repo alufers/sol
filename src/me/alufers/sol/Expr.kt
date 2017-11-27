@@ -14,6 +14,7 @@ abstract class Expr {
         fun visitThisExpr(expr: This): R
         fun visitUnaryExpr(expr: Unary): R
         fun visitVariableExpr(expr: Variable): R
+        fun visitPostfixExpr(expr: Postfix): R
     }
 
     data class Assign(val name: Token, val value: Expr) : Expr() {
@@ -68,6 +69,18 @@ abstract class Expr {
 
         override fun toString(): String {
             return "Literal (${value.toString()})"
+        }
+
+    }
+
+    data class Postfix(val left: Expr, val operator: Token) : Expr() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitPostfixExpr(this)
+        }
+
+        override fun toString(): String {
+            return "Postfix ($operator)"
         }
 
     }

@@ -1,5 +1,6 @@
 package me.alufers.sol
 
+import com.sun.org.apache.xpath.internal.operations.Plus
 import java.util.ArrayList
 import java.util.Arrays
 
@@ -275,7 +276,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     }
 
     fun call(): Expr {
-        var expr = primary()
+        var expr = suffixOperators()
         while (true) {
             if (matchToken(TokenType.LEFT_PAREN)) {
                 expr = finishCall(expr)
@@ -298,6 +299,15 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         }
         val paren = consume(TokenType.RIGHT_PAREN, "Expected ')' after arguments.")
         return Expr.Call(callee, paren, arguments)
+    }
+
+    fun suffixOperators(): Expr {
+        var expr = primary()
+        val token = previous()
+        if (matchToken(TokenType.PLUS_PLUS)) {
+            expr = Expr.Grouping(Expr.Binary(expr, Token(token.location, TokenType.PLUS, "+"), Expr.Literal(1)))
+        }
+        return expr
     }
 
     fun primary(): Expr {

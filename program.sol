@@ -47,7 +47,6 @@ if(10 < 5) {
 
 mut i = 0;
 while (i < 100) {
-
     print "i = " + i;
     i = i + 1;
 }
@@ -77,3 +76,8 @@ fun dupaArg arg {
 }
 
 dupaArg(3);
+
+fun incrementDupa num {
+    print "incrementDupa = " + num++;
+}
+incrementDupa(2);
