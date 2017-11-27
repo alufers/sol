@@ -77,3 +77,11 @@ fun dupaArg arg {
 }
 
 dupaArg(3);
+
+fun adder toAdd {
+    fun inner n return toAdd + n;
+    return inner;
+}
+
+print "CLOSURES OK: " + adder(5)(10);
+
