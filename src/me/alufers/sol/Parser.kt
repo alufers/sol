@@ -1,6 +1,6 @@
 package me.alufers.sol
 
-import com.sun.org.apache.xpath.internal.operations.Plus
+import com.sun.org.apache.xpath.internal.operations.Variable
 import java.util.ArrayList
 import java.util.Arrays
 
@@ -136,7 +136,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun returnStatement(): Stmt {
         val keyword = previous()
-        var value : Expr? = null
+        var value: Expr? = null
         if (!checkToken(TokenType.SEMICOLON)) {
             value = expression()
         }
@@ -276,7 +276,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     }
 
     fun call(): Expr {
-        var expr = suffixOperators()
+        var expr = postfixOperators()
         while (true) {
             if (matchToken(TokenType.LEFT_PAREN)) {
                 expr = finishCall(expr)
@@ -301,11 +301,11 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         return Expr.Call(callee, paren, arguments)
     }
 
-    fun suffixOperators(): Expr {
+    fun postfixOperators(): Expr {
         var expr = primary()
-        val token = previous()
         if (matchToken(TokenType.PLUS_PLUS)) {
-            expr = Expr.Grouping(Expr.Binary(expr, Token(token.location, TokenType.PLUS, "+"), Expr.Literal(1)))
+            if (expr !is Expr.Variable) throw ParseError("Invalid left-hand side expression in postfix operation", previous().location)
+            expr = Expr.Postfix(expr, previous())
         }
         return expr
     }

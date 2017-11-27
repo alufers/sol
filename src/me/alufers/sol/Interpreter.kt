@@ -225,7 +225,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
             TokenType.MINUS -> if (right is Double) {
                 -right
             } else {
-                throw RuntimeError("Can't negate a non-number", expr.operator.location)
+                throw RuntimeError("Cannot negate a non-number", expr.operator.location)
             }
             else -> throw RuntimeError("Unsupported unary operator ${expr.operator.type.lexeme}.", expr.operator.location)
 
@@ -242,8 +242,13 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
 
     override fun visitPostfixExpr(expr: Expr.Postfix): Any? {
         return when (expr.operator.type) {
-            TokenType.PLUS_PLUS ->  return evaluate(expr.left)
+            TokenType.PLUS_PLUS -> {
+                val value = evaluate(expr.left)
+                if(value !is Double) throw RuntimeError("Cannot increment ${typeName(value)}", expr.operator.location)
+                return value + 1
+            }
             else -> {
+                throw RuntimeError("Unsupported postfix operator ${expr.operator.type.lexeme}.", expr.operator.location)
             }
         }
     }
