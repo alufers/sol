@@ -336,6 +336,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
             when (peek().type) {
                 TokenType.CLASS, TokenType.FUN, TokenType.MUT, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
+                else -> {}
             }
 
             advance()
