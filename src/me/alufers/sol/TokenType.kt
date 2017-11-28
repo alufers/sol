@@ -23,7 +23,7 @@ enum class TokenType(val lexeme: String?, val isKeyword: Boolean = false) {
     GREATER(">"), GREATER_EQUAL(">="),
     LESS("<"), LESS_EQUAL("<="),
     PLUS_PLUS("++"),
-
+    MINUS_MINUS("--"),
     // Literals.
     IDENTIFIER(null),
     STRING(null), NUMBER(null),

@@ -1,6 +1,5 @@
 package me.alufers.sol
 
-import com.sun.org.apache.xpath.internal.operations.Variable
 import java.util.ArrayList
 import java.util.Arrays
 
@@ -303,9 +302,15 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun postfixOperators(): Expr {
         var expr = primary()
-        if (matchToken(TokenType.PLUS_PLUS)) {
-            if (expr !is Expr.Variable) throw ParseError("Invalid left-hand side expression in postfix operation", previous().location)
-            expr = Expr.Postfix(expr, previous())
+        when {
+            matchToken(TokenType.PLUS_PLUS) -> {
+                if (expr !is Expr.Variable) throw ParseError("Invalid left-hand side expression in postfix operation", previous().location)
+                expr = Expr.Postfix(expr, previous())
+            }
+            matchToken(TokenType.MINUS_MINUS) -> {
+                if (expr !is Expr.Variable) throw ParseError("Invalid left-hand side expression in postfix operation", previous().location)
+                expr = Expr.Postfix(expr, previous())
+            }
         }
         return expr
     }

@@ -60,7 +60,7 @@ while(true) {
         break;
     }
 }
-for mut i = 0; i < 10; i = i + 1 {
+for mut i = 0; i < 10; i++ {
     print i;
 }
 
@@ -89,3 +89,7 @@ print "CLOSURES OK: " + adder(5)(10);
 mut inc = 0;
 print "inc = " + inc++;
 print "inc = " + inc;
+
+mut dec = 0;
+print "dec = " + dec--;
+print "dec = " + dec;

@@ -41,7 +41,7 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
             '}' -> addToken(TokenType.RIGHT_BRACE)
             ',' -> addToken(TokenType.COMMA)
             '.' -> addToken(TokenType.DOT)
-            '-' -> addToken(TokenType.MINUS)
+            '-' -> addToken(if (match('-')) TokenType.MINUS_MINUS else TokenType.MINUS)
             '+' -> addToken(if (match('+')) TokenType.PLUS_PLUS else TokenType.PLUS)
             ';' -> addToken(TokenType.SEMICOLON)
             '/' -> {

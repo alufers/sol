@@ -36,7 +36,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
                 execute(innerStmt)
             }
         } finally {
-            environment = previousEnvironment ?: throw IllegalStateException("Tried to exit global environment") // move upwards
+            environment = previousEnvironment // move upwards
         }
     }
 
@@ -48,7 +48,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
                 execute(innerStmt)
             }
         } finally {
-            environment = previousEnvironment ?: throw IllegalStateException("Tried to exit global environment") // move upwards
+            environment = previousEnvironment // move upwards
         }
     }
 
@@ -241,12 +241,19 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     }
 
     override fun visitPostfixExpr(expr: Expr.Postfix): Any? {
-        return when (expr.operator.type) {
+        when (expr.operator.type) {
             TokenType.PLUS_PLUS -> {
                 if (expr.left !is Expr.Variable) throw RuntimeError("Illegal postfix left hand value.", expr.operator.location)
                 val value = evaluate(expr.left)
                 if (value !is Double) throw RuntimeError("Cannot increment ${typeName(value)}", expr.operator.location)
                 environment.set(expr.left.name.literalValue as String, value + 1)
+                return value
+            }
+            TokenType.MINUS_MINUS -> {
+                if (expr.left !is Expr.Variable) throw RuntimeError("Illegal postfix left hand value.", expr.operator.location)
+                val value = evaluate(expr.left)
+                if (value !is Double) throw RuntimeError("Cannot increment ${typeName(value)}", expr.operator.location)
+                environment.set(expr.left.name.literalValue as String, value - 1)
                 return value
             }
             else -> {
