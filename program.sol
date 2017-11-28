@@ -86,7 +86,6 @@ print "CLOSURES OK: " + adder(5)(10);
 
 
 
-fun incrementDupa num {
-    print "incrementDupa = " + num++;
-}
-incrementDupa(2);
+mut inc = 0;
+print "inc = " + inc++;
+print "inc = " + inc;

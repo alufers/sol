@@ -243,9 +243,11 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
     override fun visitPostfixExpr(expr: Expr.Postfix): Any? {
         return when (expr.operator.type) {
             TokenType.PLUS_PLUS -> {
+                if (expr.left !is Expr.Variable) throw RuntimeError("Illegal postfix left hand value.", expr.operator.location)
                 val value = evaluate(expr.left)
-                if(value !is Double) throw RuntimeError("Cannot increment ${typeName(value)}", expr.operator.location)
-                return value + 1
+                if (value !is Double) throw RuntimeError("Cannot increment ${typeName(value)}", expr.operator.location)
+                environment.set(expr.left.name.literalValue as String, value + 1)
+                return value
             }
             else -> {
                 throw RuntimeError("Unsupported postfix operator ${expr.operator.type.lexeme}.", expr.operator.location)
