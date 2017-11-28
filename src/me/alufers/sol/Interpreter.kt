@@ -180,7 +180,7 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
         }
         val function = callee
 
-        if (arguments.size !== function.arity()) {
+        if (arguments.size != function.arity()) {
             throw RuntimeError("Expected " +
                     function.arity() + " arguments but got " +
                     arguments.size + ".", expr.paren.location)
