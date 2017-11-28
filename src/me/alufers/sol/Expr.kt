@@ -31,7 +31,7 @@ abstract class Expr {
         }
 
         override fun toString(): String {
-            return "Binary L=(${left.toString()}) OP=${operator.toString()} R=(${right.toString()}) "
+            return "Binary L=($left) OP=$operator R=($right) "
         }
     }
 
@@ -56,7 +56,7 @@ abstract class Expr {
         }
 
         override fun toString(): String {
-            return "Grouping (${expression.toString()})"
+            return "Grouping ($expression)"
         }
 
     }
@@ -120,7 +120,7 @@ abstract class Expr {
         }
 
         override fun toString(): String {
-            return "Unary OP=${operator.toString()} R=(${right.toString()}) "
+            return "Unary OP=$operator R=($right) "
         }
     }
 

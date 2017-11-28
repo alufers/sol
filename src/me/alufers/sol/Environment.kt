@@ -20,7 +20,7 @@ class Environment(val parent: Environment? = null) {
                 throw ValueNotDefinedError("$name is not defined")
             }
         }
-        return values.get(name)
+        return values[name]
     }
 
     fun set(name: String, value: Any?) {

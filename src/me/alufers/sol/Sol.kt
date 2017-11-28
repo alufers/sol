@@ -49,7 +49,7 @@ fun runFromFile(path: String): Boolean {
 }
 
 fun main(args: Array<String>) {
-    if (args.size > 0) {
+    if (args.isNotEmpty()) {
         System.exit(if (runFromFile(args[0])) 0 else 666)
     } else {
         repl()
