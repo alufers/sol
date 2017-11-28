@@ -93,3 +93,9 @@ print "inc = " + inc;
 mut dec = 0;
 print "dec = " + dec--;
 print "dec = " + dec;
+
+// test const
+const inmutable = 1;
+inmutable = 2;
+print inmutable;
+

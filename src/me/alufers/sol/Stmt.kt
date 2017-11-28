@@ -11,6 +11,7 @@ abstract class Stmt {
         fun visitReturnStmt(stmt: Return): R
         fun visitBreakStmt(stmt: Break): R
         fun visitMutDeclarationStmt(stmt: MutDeclaration): R
+        fun visitConstDeclarationStmt(stmt: ConstDeclaration): R
         fun visitWhileStmt(stmt: While): R
     }
 
@@ -89,6 +90,13 @@ abstract class Stmt {
 
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitMutDeclarationStmt(this)
+        }
+    }
+
+    data class ConstDeclaration(val name: Token, val initializer: Expr?) : Stmt() {
+
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitConstDeclarationStmt(this)
         }
     }
 

@@ -1,5 +1,6 @@
 package me.alufers.sol
 
+import com.sun.org.apache.xpath.internal.operations.Variable
 import java.util.ArrayList
 import java.util.Arrays
 
@@ -21,12 +22,13 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     }
 
     fun declaration(): Stmt {
-        if (matchToken(TokenType.MUT)) return varDeclaration()
+        if (matchToken(TokenType.MUT)) return mutDeclaration()
+        if (matchToken(TokenType.CONST)) return constDeclaration()
         if (matchToken(TokenType.FUN)) return functionDeclaration()
         return statement()
     }
 
-    fun varDeclaration(): Stmt {
+    fun mutDeclaration(): Stmt {
         val name = consume(TokenType.IDENTIFIER, "Expected variable name after 'var' keyword")
         var initializer: Expr? = null
         if (matchToken(TokenType.EQUAL)) { // initializer present
@@ -34,6 +36,16 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
         }
         consume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
         return Stmt.MutDeclaration(name, initializer)
+    }
+
+    fun constDeclaration(): Stmt {
+        val name = consume(TokenType.IDENTIFIER, "Expected variable name after 'var' keyword")
+        var initializer: Expr? = null
+        if (matchToken(TokenType.EQUAL)) { // initializer present
+            initializer = expression()
+        }
+        consume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
+        return Stmt.ConstDeclaration(name, initializer)
     }
 
     fun functionDeclaration(): Stmt {
@@ -93,7 +105,8 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
     fun forStatement(): Stmt {
         val initializer: Stmt? = when {
             matchToken(TokenType.SEMICOLON) -> null
-            matchToken(TokenType.MUT) -> varDeclaration()
+            matchToken(TokenType.MUT) -> mutDeclaration()
+            matchToken(TokenType.CONST) -> constDeclaration()
             else -> expressionStatement()
         }
         var condition: Expr? = null
@@ -340,7 +353,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
             if (previous().type === TokenType.SEMICOLON) return
 
             when (peek().type) {
-                TokenType.CLASS, TokenType.FUN, TokenType.MUT, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
+                TokenType.CLASS, TokenType.FUN, TokenType.MUT, TokenType.CONST, TokenType.FOR, TokenType.IF, TokenType.WHILE, TokenType.PRINT, TokenType.RETURN -> return
                 else -> {}
             }
 

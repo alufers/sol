@@ -86,7 +86,25 @@ class Interpreter(val errorReporter: ErrorReporter) : Expr.Visitor<Any?>, Stmt.V
 
     override fun visitMutDeclarationStmt(stmt: Stmt.MutDeclaration) {
         try {
-            environment.define(stmt.name.literalValue as String, if (stmt.initializer != null) evaluate(stmt.initializer) else null)
+            environment.define(stmt.name.literalValue as String,
+                    when {
+                        stmt.initializer != null -> evaluate(stmt.initializer)
+                        else -> null
+                    })
+        } catch (e: Environment.ValueAlreadyDefinedError) {
+            throw RuntimeError(e.message ?: "ValueAlreadyDefinedError", stmt.name.location)
+        }
+    }
+
+    override fun visitConstDeclarationStmt(stmt: Stmt.ConstDeclaration) {
+        try {
+            environment.define(stmt.name.literalValue as String,
+                    when {
+                        stmt.initializer != null -> {
+                            evaluate(stmt.initializer)
+                        }
+                        else -> null
+                    })
         } catch (e: Environment.ValueAlreadyDefinedError) {
             throw RuntimeError(e.message ?: "ValueAlreadyDefinedError", stmt.name.location)
         }

@@ -45,6 +45,7 @@ enum class TokenType(val lexeme: String?, val isKeyword: Boolean = false) {
     THIS("this", true),
     TRUE("true", true),
     MUT("mut", true),
+    CONST("const", true),
     WHILE("while", true),
 
     EOF(null);

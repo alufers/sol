@@ -33,6 +33,6 @@ class Environment(val parent: Environment? = null) {
             }
         }
 
-        values.set(name, value)
+        values[name] = value
     }
 }
