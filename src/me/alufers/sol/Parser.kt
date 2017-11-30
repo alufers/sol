@@ -124,7 +124,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
                     body,
                     Stmt.Expression(increment)))
         }
-        if (condition == null) condition = Expr.Literal(true)
+        if (condition == null) condition = Expr.Literal(true, previous().location)
         body = Stmt.While(condition, body)
         if (initializer != null) {
             body = Stmt.Block(Arrays.asList(initializer, body))
@@ -330,10 +330,10 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun primary(): Expr {
         return when {
-            matchToken(TokenType.TRUE) -> Expr.Literal(true)
-            matchToken(TokenType.FALSE) -> Expr.Literal(false)
-            matchToken(TokenType.NIL) -> Expr.Literal(null)
-            matchToken(TokenType.NUMBER, TokenType.STRING) -> Expr.Literal(previous().literalValue)
+            matchToken(TokenType.TRUE) -> Expr.Literal(true, previous().location)
+            matchToken(TokenType.FALSE) -> Expr.Literal(false,  previous().location)
+            matchToken(TokenType.NIL) -> Expr.Literal(null,  previous().location)
+            matchToken(TokenType.NUMBER, TokenType.STRING) -> Expr.Literal(previous().literalValue,  previous().location)
             matchToken(TokenType.IDENTIFIER) -> Expr.Variable(previous())
             matchToken(TokenType.LEFT_PAREN) -> {
                 val expr = expression()

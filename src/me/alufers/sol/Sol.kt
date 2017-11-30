@@ -12,9 +12,13 @@ fun runCode(source: String, label: String): Boolean {
     if (!reporter.hadError) {
         val parser = Parser(ArrayList(tokens), reporter)
         val statements = parser.parse()
-        if (!reporter.hadError) {
-            val interpreter = Interpreter(reporter)
-            interpreter.interpret(statements ?: ArrayList())
+        if (!reporter.hadError && statements != null) {
+            //val interpreter = Interpreter(reporter)
+           // interpreter.interpret(statements ?: ArrayList())
+
+            val compiler = BytecodeCompiler(reporter)
+            compiler.compile(statements)
+            compiler.bytecodeBuilder.debugPrintBytecode()
             if (reporter.hadError) {
                 return false
             }
