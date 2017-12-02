@@ -13,12 +13,38 @@ fun runCode(source: String, label: String): Boolean {
         val parser = Parser(ArrayList(tokens), reporter)
         val statements = parser.parse()
         if (!reporter.hadError && statements != null) {
-            //val interpreter = Interpreter(reporter)
-           // interpreter.interpret(statements ?: ArrayList())
+            val interpreter = Interpreter(reporter)
+            interpreter.interpret(statements ?: ArrayList())
+
+        } else {
+            return false
+        }
+    } else {
+        return false
+    }
+    println("finished in " + (System.currentTimeMillis() - start).toString() + "ms")
+    return true
+
+}
+
+
+fun compileCode(source: String, label: String): Boolean {
+    val reporter = ErrorReporter(label)
+    val scanner = Scanner(source, reporter)
+    val tokens = scanner.scan()
+    val start = System.currentTimeMillis()
+    if (!reporter.hadError) {
+        val parser = Parser(ArrayList(tokens), reporter)
+        val statements = parser.parse()
+        if (!reporter.hadError && statements != null) {
 
             val compiler = BytecodeCompiler(reporter)
             compiler.compile(statements)
-            compiler.bytecodeBuilder.debugPrintBytecode()
+            compiler.bytecodeBuilder.resolveReferences()
+            val file = File("smroot.bin")
+            val arr = compiler.bytecodeBuilder.buildBytecode()
+
+            file.writeBytes(arr)
             if (reporter.hadError) {
                 return false
             }
@@ -42,7 +68,7 @@ fun repl() {
         if (line == null) {
             continue
         }
-        runCode(line, "<REPL>")
+        compileCode(line, "<REPL>")
     }
 }
 

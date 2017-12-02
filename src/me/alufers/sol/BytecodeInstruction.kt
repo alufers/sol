@@ -1,147 +1,215 @@
 package me.alufers.sol
 
 abstract class BytecodeInstruction(val opCode: Byte) {
+
+    val references = ArrayList<BytecodeReference>()
+    abstract fun serializeToBinary(bb: BinaryBuilder)
+
+    open class SimpleInstruction(opCode: Byte) : BytecodeInstruction(opCode) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+        }
+    }
+
     /**
      * Does nothing.
      */
-    /**/ class NoOp() : BytecodeInstruction(0x00)
+    /**/ class NoOp() : SimpleInstruction(0x00)
 
     /**
      * Adds a number literal onto the stack
      */
-    data class PushNumber(val value: Double) : BytecodeInstruction(0x01)
+    data class PushNumber(val value: Double) : BytecodeInstruction(0x01) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putDouble(value)
+        }
+    }
 
     /**
      * Adds a string literal onto the stack
      */
-    data class PushString(val value: String) : BytecodeInstruction(0x02)
+    data class PushString(val value: String) : BytecodeInstruction(0x02) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putString(value)
+        }
+    }
 
     /**
      * Adds a boolean literal onto the stack
      */
-    data class PushBoolean(val value: Boolean) : BytecodeInstruction(0x03)
+    data class PushBoolean(val value: Boolean) : BytecodeInstruction(0x03) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putBoolean(value)
+        }
+    }
 
     /**
      * Adds a nil onto the stack.
      */
-    /**/ class PushNil() : BytecodeInstruction(0x04)
+    /**/ class PushNil() : SimpleInstruction(0x04)
 
     /**
      * Pops elements from the stack
      */
-    /**/ class Pop() : BytecodeInstruction(0x05)
+    /**/ class Pop() : SimpleInstruction(0x05)
 
     /**
      * Defines a new variable in the current environment
      */
-    data class DefineVar(val name: String) : BytecodeInstruction(0x06)
+    data class DefineVar(val name: String) : BytecodeInstruction(0x06) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putString(name)
+        }
+    }
 
     /**
      * Assigns a value from the stack to a variable in the current environment
      */
-    data class AssignVar(val name: String) : BytecodeInstruction(0x07)
+    data class AssignVar(val name: String) : BytecodeInstruction(0x07) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putString(name)
+        }
+    }
 
     /**
      * Loads a variable from the current environment and places it on the stack
      */
-    data class LoadVar(val name: String) : BytecodeInstruction(0x08)
+    data class LoadVar(val name: String) : BytecodeInstruction(0x08) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putString(name)
+        }
+    }
 
     /**
      * Evaluates TOS1 + TOS and pushes the result on the stack
      */
-    /**/ class BinaryAdd() : BytecodeInstruction(0x09)
+    /**/ class BinaryAdd() : SimpleInstruction(0x09)
 
     /**
      *  Evaluates TOS1 - TOS  and pushes the result on the stack
      */
-    /**/ class BinarySubstract() : BytecodeInstruction(0x0A)
+    /**/ class BinarySubstract() : SimpleInstruction(0x0A)
 
     /**
      *  Evaluates TOS1 * TOS  and pushes the result on the stack
      */
-    /**/ class BinaryMultiply() : BytecodeInstruction(0x0B)
+    /**/ class BinaryMultiply() : SimpleInstruction(0x0B)
 
     /**
      *  Evaluates TOS1 / TOS  and pushes the result on the stack
      */
-    /**/ class BinaryDivide() : BytecodeInstruction(0x0C)
+    /**/ class BinaryDivide() : SimpleInstruction(0x0C)
 
     /**
      *  Evaluates TOS1 % TOS  and pushes the result on the stack
      */
-    /**/ class BinaryModulo() : BytecodeInstruction(0x0D)
+    /**/ class BinaryModulo() : SimpleInstruction(0x0D)
 
     /**
      *  Evaluates TOS1 ** TOS  and pushes the result on the stack
      */
-    /**/ class BinaryExponentiate() : BytecodeInstruction(0x0E)
+    /**/ class BinaryExponentiate() : SimpleInstruction(0x0E)
 
     /**
      *  Evaluates  -TOS and pushes the result on the stack
      */
-    /**/ class UnaryNumericalNegate() : BytecodeInstruction(0x0F)
+    /**/ class UnaryNumericalNegate() : SimpleInstruction(0x0F)
 
     /**
      *  Evaluates !TOS and pushes the result on the stack
      */
-    /**/ class UnaryLogicalNegate() : BytecodeInstruction(0x10)
+    /**/ class UnaryLogicalNegate() : SimpleInstruction(0x10)
 
     /**
      *  Creates a new block with an environment and pushes it on the block stack
      */
-    /**/ class PushBlock() : BytecodeInstruction(0x11)
+    /**/ class PushBlock() : SimpleInstruction(0x11)
 
     /**
      *  Pops a block from the block stack
      */
-    /**/ class PopBlock() : BytecodeInstruction(0x12)
+    /**/ class PopBlock() : SimpleInstruction(0x12)
 
     /**
      * Swaps TOS and TOS1
      */
-    /**/ class Swap() :BytecodeInstruction(0x13)
+    /**/ class Swap() : SimpleInstruction(0x13)
 
     /**
      * Evaluates TOS1 == TOS  and pushes the result on the stack
      */
-    /**/ class BinaryCompareEquals() :BytecodeInstruction(0x14)
+    /**/ class BinaryCompareEquals() : SimpleInstruction(0x14)
 
     /**
      * Evaluates TOS1 != TOS  and pushes the result on the stack
      */
-    /**/ class BinaryCompareNotEquals() :BytecodeInstruction(0x15)
+    /**/ class BinaryCompareNotEquals() : SimpleInstruction(0x15)
 
     /**
      * Evaluates TOS1 > TOS  and pushes the result on the stack
      */
-    /**/ class BinaryCompareGreater() :BytecodeInstruction(0x16)
+    /**/ class BinaryCompareGreater() : SimpleInstruction(0x16)
 
     /**
      * Evaluates TOS1 >= TOS  and pushes the result on the stack
      */
-    /**/ class BinaryCompareGreaterEqual() :BytecodeInstruction(0x17)
+    /**/ class BinaryCompareGreaterEqual() : SimpleInstruction(0x17)
 
     /**
      * Evaluates TOS1 < TOS  and pushes the result on the stack
      */
-    /**/ class BinaryCompareLess() :BytecodeInstruction(0x18)
+    /**/ class BinaryCompareLess() : SimpleInstruction(0x18)
 
     /**
      * Evaluates TOS1 <= TOS  and pushes the result on the stack
      */
-    /**/ class BinaryCompareLessEqual() :BytecodeInstruction(0x19)
+    /**/ class BinaryCompareLessEqual() : SimpleInstruction(0x19)
 
     /**
-     * Evaluates TOS1 or TOS  and pushes the result on the stack
+     * Jumps to DEST when TOS is truthy
      */
-    /**/ class BinaryLogicalOr() :BytecodeInstruction(0x1A)
+    data class JumpTruthy(val dest: BytecodeReference) : BytecodeInstruction(0x1A) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putInt(dest.resolvedAddress ?: 0)
+        }
+    }
 
     /**
-     * Evaluates TOS1 and TOS  and pushes the result on the stack
+     * Jumps to DEST when TOS is not truthy
      */
-    /**/ class BinaryLogicalAnd() :BytecodeInstruction(0x1B)
+    data class JumpNotTruthy(val dest: BytecodeReference) : BytecodeInstruction(0x1B) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putInt(dest.resolvedAddress ?: 0)
+        }
+    }
 
+    /**
+     * Jumps to DEST
+     */
+    data class Jump(val dest: BytecodeReference) : BytecodeInstruction(0x1C) {
+        override fun serializeToBinary(bb: BinaryBuilder) {
+            bb.putByte(opCode)
+            bb.putInt(dest.resolvedAddress ?: 0)
+        }
+    }
 
+    /**
+     * Increments TOS and pushes the result onto the stack
+     */
+    /**/ class Increment() : SimpleInstruction(0x1D)
+
+    /**
+     * Decrements TOS and pushes the result onto the stack
+     */
+    /**/ class Decrement() : SimpleInstruction(0x1E)
 
 
 }

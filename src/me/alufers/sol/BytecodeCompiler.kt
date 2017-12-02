@@ -14,6 +14,8 @@ class BytecodeCompiler(val errorReporter: ErrorReporter) : Expr.Visitor<Unit>, S
             for (stmt in statements) {
                 compileStatement(stmt)
             }
+            addIns(BytecodeInstruction.NoOp()) // add last noop so that all references can be flushed
+
         } catch (e: CompileError) {
             errorReporter.reportError(e.message ?: "Unknown error", e.location)
         }
@@ -78,7 +80,24 @@ class BytecodeCompiler(val errorReporter: ErrorReporter) : Expr.Visitor<Unit>, S
     }
 
     override fun visitLogicalExpr(expr: Expr.Logical) {
-        TODO("XD")
+        when (expr.operator.type) {
+            TokenType.OR -> {
+                compileExpression(expr.left)
+                val endRef = BytecodeReference()
+                addIns(BytecodeInstruction.JumpTruthy(endRef))
+                addIns(BytecodeInstruction.Pop())
+                compileExpression(expr.right)
+                bytecodeBuilder.addRefForNextInstruction(endRef)
+            }
+            TokenType.AND -> {
+                compileExpression(expr.left)
+                val endRef = BytecodeReference()
+                addIns(BytecodeInstruction.JumpNotTruthy(endRef))
+                addIns(BytecodeInstruction.Pop())
+                compileExpression(expr.right)
+                bytecodeBuilder.addRefForNextInstruction(endRef)
+            }
+        }
     }
 
     override fun visitSetExpr(expr: Expr.Set) {
@@ -105,7 +124,14 @@ class BytecodeCompiler(val errorReporter: ErrorReporter) : Expr.Visitor<Unit>, S
     }
 
     override fun visitPostfixExpr(expr: Expr.Postfix) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (expr.left !is Expr.Variable) throw CompileError("Illegal postfix left hand value.", expr.operator.location)
+        addIns(BytecodeInstruction.LoadVar(expr.left.name.literalValue as String))
+        when (expr.operator.type) {
+            TokenType.PLUS_PLUS -> addIns(BytecodeInstruction.Increment())
+            TokenType.MINUS_MINUS -> addIns(BytecodeInstruction.Decrement())
+        }
+        addIns(BytecodeInstruction.AssignVar(expr.left.name.literalValue))
+        addIns(BytecodeInstruction.Pop())
     }
 
     fun compileStatement(stmt: Stmt) {
@@ -134,7 +160,24 @@ class BytecodeCompiler(val errorReporter: ErrorReporter) : Expr.Visitor<Unit>, S
     }
 
     override fun visitIfStmt(stmt: Stmt.If) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        compileExpression(stmt.condition)
+        val endRef = BytecodeReference()
+
+        if(stmt.elseBranch != null) {
+            val elseRef = BytecodeReference()
+            addIns(BytecodeInstruction.JumpTruthy(elseRef))
+            addIns(BytecodeInstruction.Pop()) // discard the result of the condition
+            compileStatement(stmt.thenBranch)
+            addIns(BytecodeInstruction.Jump(endRef))
+            bytecodeBuilder.addRefForNextInstruction(elseRef)
+            compileStatement(stmt.elseBranch)
+        } else {
+            addIns(BytecodeInstruction.JumpTruthy(endRef))
+            addIns(BytecodeInstruction.Pop())
+            compileStatement(stmt.thenBranch)
+        }
+        bytecodeBuilder.addRefForNextInstruction(endRef)
+
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print) {
