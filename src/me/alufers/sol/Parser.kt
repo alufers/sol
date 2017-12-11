@@ -186,7 +186,7 @@ class Parser(val tokens: ArrayList<Token>, val errorReporter: ErrorReporter) {
 
     fun assignment(): Expr {
         val expr = or()
-        if (matchToken(TokenType.EQUAL)) {
+        if (matchToken(TokenType.EQUAL, TokenType.PLUS_EQUAL, TokenType.MINUS_EQUAL)) {
             return when (expr) {
                 is Expr.Variable -> Expr.Assign(expr.name, expression())
                 else -> throw ParseError("Invalid assignment target", getLocation())

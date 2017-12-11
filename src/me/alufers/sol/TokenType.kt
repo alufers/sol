@@ -24,6 +24,8 @@ enum class TokenType(val lexeme: String?, val isKeyword: Boolean = false) {
     LESS("<"), LESS_EQUAL("<="),
     PLUS_PLUS("++"),
     MINUS_MINUS("--"),
+    PLUS_EQUAL("+="),
+    MINUS_EQUAL("-="),
     // Literals.
     IDENTIFIER(null),
     STRING(null), NUMBER(null),

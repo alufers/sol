@@ -9,7 +9,7 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
     var currentChar: Int = 0 // char offset from the start of the source
     var start: Int = 0 // start of the current lexeme (from start of the source)
 
-    private var keywordTokens =  HashMap<String, TokenType>()
+    private var keywordTokens = HashMap<String, TokenType>()
 
     fun prepare() {
         for (tt in TokenType.values().filter { it.isKeyword }) {
@@ -41,14 +41,22 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
             '}' -> addToken(TokenType.RIGHT_BRACE)
             ',' -> addToken(TokenType.COMMA)
             '.' -> addToken(TokenType.DOT)
-            '-' -> addToken(if (match('-')) TokenType.MINUS_MINUS else TokenType.MINUS)
-            '+' -> addToken(if (match('+')) TokenType.PLUS_PLUS else TokenType.PLUS)
+            '-' -> addToken(when {
+                match('-') -> TokenType.MINUS_MINUS
+                match('=') -> TokenType.MINUS_EQUAL
+                else -> TokenType.MINUS
+            })
+            '+' -> addToken(when {
+                match('+') -> TokenType.PLUS_PLUS
+                match('=') -> TokenType.PLUS_EQUAL
+                else -> TokenType.PLUS
+            }
+            )
             ';' -> addToken(TokenType.SEMICOLON)
             '/' -> {
-                if (match('/')) {
-                    while (peek() != '\n' && !isAtEnd()) advance()
-                } else {
-                    addToken(TokenType.SLASH)
+                when {
+                    match('/') -> while (peek() != '\n' && !isAtEnd()) advance()
+                    else -> addToken(TokenType.SLASH)
                 }
             }
             '*' -> addToken(if (match('*')) TokenType.STAR_STAR else TokenType.STAR)
@@ -61,12 +69,10 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
             '\n', '\r', '\t', ' ' -> {
             }
             else -> {
-                if (c in '0'..'9') {
-                    consumeNumberLiteral()
-                } else if (isAlpha(c)) {
-                    consumeIdentifierOrKeyword()
-                } else {
-                    errorReporter.reportError("Unexpected character $c", getLocation())
+                when {
+                    c in '0'..'9' -> consumeNumberLiteral()
+                    isAlpha(c) -> consumeIdentifierOrKeyword()
+                    else -> errorReporter.reportError("Unexpected character $c", getLocation())
                 }
 
             }
@@ -79,7 +85,7 @@ class Scanner(val source: String, val errorReporter: ErrorReporter) {
             advance()
         }
         val value = source.substring(start, currentChar)
-        if(keywordTokens.contains(value)) {
+        if (keywordTokens.contains(value)) {
             addToken(keywordTokens[value] ?: TokenType.IDENTIFIER)
             return
         }
